@@ -83,6 +83,10 @@ choco install easy.install -y
 Write-Verbose "Starting Nuget installation..."
 choco install nuget.commandline -y
 
+# Install putty
+Write-Verbose "Starting Putty installation..."
+choco install putty -y
+
 #choco install curl -y
 #choco install wget -y
 
