@@ -70,7 +70,7 @@ choco install jdk8 -y
 choco install eclipse -y
 choco install maven -y
 choco install apache.ant -y
-choco install tomcat -y
+#choco install tomcat -y
 
 # Install Python Env
 #Write-Verbose "Starting Python Env installation..."
