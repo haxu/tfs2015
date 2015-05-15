@@ -73,11 +73,11 @@ choco install apache.ant -y
 choco install tomcat -y
 
 # Install Python Env
-Write-Verbose "Starting Python Env installation..."
+#Write-Verbose "Starting Python Env installation..."
 choco install python -y
-choco install python2 -y
-choco install pip -y
-choco install easy.install -y
+#choco install python2 -y
+#choco install pip -y
+#choco install easy.install -y
 
 # Install Nuget
 Write-Verbose "Starting Nuget installation..."
@@ -93,6 +93,18 @@ choco install putty -y
 # Install Visual Studio Code
 Write-Verbose "Starting Visual Studio Code installation..."
 choco install visualstudiocode -y
+
+#Install SQL
+Write-Verbose "Starting SQLServer 2014 express installation..."
+choco install sqlserver2014express  -y
+
+#Install TFS2013
+Write-Verbose "Starting TFS 2013 express installation..."
+choco install visualstudioteamfoundationserverexpress2013 -y
+
+#Install VS2013
+Write-Verbose "Starting VS2013 ultimate express installation..."
+choco install visualstudio2013ultimate
 
 Write-Verbose "Prerequisites script finished."
 Write-Host -NoNewLine 'Press any key to finish...';
