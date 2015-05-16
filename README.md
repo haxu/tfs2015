@@ -1,7 +1,7 @@
 TFS2015RC Auto Installation Script.
 ===================================
 
-Help admin quickly deploy Microsoft Team Foundation Server 2015 RC and corss platform build environment.
+Help admin to deploy Microsoft Team Foundation Server 2015 RC and corss platform build environment quickly.
 
 All the software installation depend on internet connection.
 
@@ -10,15 +10,12 @@ The Scirpt has been tested on Azure Windows Server 2012 R2 VM and Azure Ubuntu 1
 Usage:
 -------------------------------------------------------------------
 ###tfs-server-install.ps1 is for windows server powershell
-
-run it directly
+	run it directly
 	.\tfs-server-install.ps1
 
 ###tfs-linuxagent-install.sh is for linux bash
-
-run this script with root
-
-ubuntu e.g.
+	run this script with root
+	ubuntu e.g.
 	sudo .\tfs-linuxagent-install.sh
 
 
