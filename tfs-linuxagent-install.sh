@@ -1,4 +1,4 @@
-#!bin/bash
+c#!bin/bash
 
 clear
 echo "**********************TFS linux build agent pre-installation**********************"
@@ -6,7 +6,7 @@ echo "**********************TFS linux build agent pre-installation**************
 echo "**********************Update First**********************"
 apt-get update -y
 apt-get upgrade -y
-apt-get install -y vsftpd
+
 echo "******************************************************************"
 echo "**********************Starting gcc Install**********************"
 echo "******************************************************************"

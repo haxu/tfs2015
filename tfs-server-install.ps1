@@ -47,7 +47,7 @@ iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.p
 
 # Install NodeJS
 Write-Verbose "Starting NodeJS installation..."
-cinst NodeJs -yge
+cinst NodeJs -y
 # Install Azure PowerShell
 Write-Verbose "Starting Azure Web Platform Installer..."
 cinst webpicmd -y
