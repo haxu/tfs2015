@@ -1,10 +1,117 @@
+
+Function insInit
+{
+  #Write-Verbose "Enable .Net Framework 3.5"
+  #dism /online /enable-feature /featurename:NETFX3 /all
+  #Write-Verbose "Enable Basic Authentication"
+  #dism /online /enable-feature /featurename:IIS-BasicAuthentication /all
+  Write-Verbose "Starting Chocolatey installation.."
+  iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+
+  # Install NodeJS
+  Write-Verbose "Starting NodeJS installation..."
+  cinst NodeJs -y
+  # Install Azure PowerShell
+  Write-Verbose "Starting Azure Web Platform Installer..."
+  cinst webpicmd -y
+  webpicmd /Install /Products:"Microsoft Azure Powershell with Microsoft Azure Sdk" /AcceptEula
+
+  # Install Microsoft Azure Cross Platform Command Line
+  #Write-Verbose "Starting Microsoft Azure Cross Platform Command Line installation"
+  #npm install azure-cli -g
+  #$npmpath = npm config get prefix
+  #setx PATH "$env:path;$npmpath" -m
+  # Install WAWSDeploy
+  #cinst wawsdeploy -y
+
+  # Install 7zip
+  Write-Verbose "Starting 7zip installation..."
+  choco install 7zip -y
+  # Install Git
+  Write-Verbose "Starting git installation..."
+  choco install git -y
+}
+
+Function insBuild
+{
+  # Install Java Dev Env
+  Write-Verbose "Starting Java Env installation..."
+  choco install jdk8 -y
+  choco install eclipse -y
+  # choco install maven -y
+  choco install apache.ant -y
+  # choco install tomcat -y
+
+  # Install Python Env
+  Write-Verbose "Starting Python Env installation..."
+  choco install python -y
+  # Install Nuget
+  Write-Verbose "Starting Nuget installation..."
+  choco install nuget.commandline -y
+  # Install putty
+  Write-Verbose "Starting Putty installation..."
+  choco install putty -y
+  # Install Visual Studio Code
+  Write-Verbose "Starting Visual Studio Code installation..."
+  choco install visualstudiocode -y
+}
+
+Function insTfs
+{
+  $tempdir = Test-Path -Path "C:\temp"
+  if(!$tempdir)
+  {
+    mkdir C:\temp
+  }
+
+  Write-Verbose "Downloading TFS"
+  Invoke-WebRequest "http://download.microsoft.com/download/2/7/B/27B1E73B-8B2D-4EAF-A3D2-1E64290D9141/tfs_server.exe" -OutFile "c:\temp\tfs2015rc.exe"
+
+  #TFS2015RC install
+  c:\temp\tfs2015rc.exe /Full /Quiet
+  Write-Verbose "Starting TFS Installation"
+  Start-Sleep -s 300
+  do
+  {
+    Start-Sleep -s 60
+    $tfsInstalled = Test-Path -Path "$env:ProgramFiles\Microsoft Team Foundation Server 14.0\Tools\TfsConfig.exe"
+  }
+  until($tfsInstalled)
+  Write-Verbose "TFS Installation Completed"
+}
+
+Function insVs
+{
+  #VS2015RC install
+  Write-Verbose "Starting VS Installation"
+  webpicmd /Install /Products:"Visual Studio Community Edition 2015 Release Candidate" /AcceptEula
+
+  #Start-Sleep -s 600
+  #do
+  #{
+  #  Start-Sleep -s 120
+  #  $vsInstalled = Test-Path -Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe"
+  #}
+  #until($vsInstalled)
+  Write-Verbose "VS Installation Completed"
+}
+
+###################################################################################################################3
 Write-Host "---------------------------------------------------------------------------"
 Write-Host "|  Team Foundation Server 2015 RC Deployment Script v1.0                  |"
 Write-Host "|  Please Ensure You Have Internet Access                                 |"
 Write-Host "|  Installtation File around 5GB, time cost depends on the network speed  |"
 Write-Host "---------------------------------------------------------------------------"
-Write-Host "Press any key to continue..."
-Read-Host
+Write-Host ""
+Write-Host ""
+Write-Host "***************************************************************************"
+Write-Host "* Please choose your installation option:                                 *"
+Write-Host "*  Option[1]: TFS Full (TFS, Visual Studio and Build env)                 *" 
+Write-Host "*  Option[2]: TFS and Build without VS (TFS and Build env)                *"
+Write-Host "*  Option[3]: TFS only (Server only)                                      *"
+Write-Host "*  Option[4]: Build Env Only                                              *"
+Write-Host "***************************************************************************"
+$insmode = Read-Host
 
 # The script has been tested on Powershell 3.0
 Set-StrictMode -Version 3
@@ -37,92 +144,34 @@ if ($(Get-ExecutionPolicy) -eq "Restricted")
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
 }
 
-#Write-Verbose "Enable .Net Framework 3.5"
-#dism /online /enable-feature /featurename:NETFX3 /all
-#Write-Verbose "Enable Basic Authentication"
-#dism /online /enable-feature /featurename:IIS-BasicAuthentication /all
-
-Write-Verbose "Starting Chocolatey installation.."
-iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
-
-# Install NodeJS
-Write-Verbose "Starting NodeJS installation..."
-cinst NodeJs -y
-# Install Azure PowerShell
-Write-Verbose "Starting Azure Web Platform Installer..."
-cinst webpicmd -y
-webpicmd /Install /Products:"Microsoft Azure Powershell with Microsoft Azure Sdk" /AcceptEula
-
-# Install Microsoft Azure Cross Platform Command Line
-#Write-Verbose "Starting Microsoft Azure Cross Platform Command Line installation"
-#npm install azure-cli -g
-#$npmpath = npm config get prefix
-#setx PATH "$env:path;$npmpath" -m
-# Install WAWSDeploy
-#cinst wawsdeploy -y
-
-# Install 7zip
-Write-Verbose "Starting 7zip installation..."
-choco install 7zip -y
-# Install Git
-Write-Verbose "Starting git installation..."
-choco install git -y
-
-# Install Java Dev Env
-Write-Verbose "Starting Java Env installation..."
-choco install jdk8 -y
-choco install eclipse -y
-#choco install maven -y
-choco install apache.ant -y
-#choco install tomcat -y
-
-# Install Python Env
-Write-Verbose "Starting Python Env installation..."
-choco install python -y
-# Install Nuget
-Write-Verbose "Starting Nuget installation..."
-choco install nuget.commandline -y
-# Install putty
-Write-Verbose "Starting Putty installation..."
-choco install putty -y
-# Install Visual Studio Code
-Write-Verbose "Starting Visual Studio Code installation..."
-choco install visualstudiocode -y
-
-$tempdir = Test-Path -Path "C:\temp"
-if(!$tempdir)
+If( $insmode -eq 1 )
 {
-mkdir C:\temp
+  insInit
+  insBuild
+  insTfs
+  insVs
 }
-
-Write-Verbose "Downloading TFS"
-Invoke-WebRequest "http://download.microsoft.com/download/2/7/B/27B1E73B-8B2D-4EAF-A3D2-1E64290D9141/tfs_server.exe" -OutFile "c:\temp\tfs2015rc.exe"
-
-#TFS2015RC install
-c:\temp\tfs2015rc.exe /Full /Quiet
-Write-Verbose "Starting TFS Installation"
-Start-Sleep -s 300
-do
+elseif( $insmode -eq 2 )
 {
-  Start-Sleep -s 60
-  $tfsInstalled = Test-Path -Path "$env:ProgramFiles\Microsoft Team Foundation Server 14.0\Tools\TfsConfig.exe"
+  insInit
+  insBuild
+  insTfs
 }
-until($tfsInstalled)
-Write-Verbose "TFS Installation Completed"
-
-#VS2015RC install
-Write-Verbose "Starting VS Installation"
-webpicmd /Install /Products:"Visual Studio Community Edition 2015 Release Candidate" /AcceptEula
-
-#Start-Sleep -s 600
-#do
-#{
-#  Start-Sleep -s 120
-#  $vsInstalled = Test-Path -Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe"
-#}
-#until($vsInstalled)
-Write-Verbose "VS Installation Completed"
-
+elseif( $insmode -eq 3 )
+{
+  insInit
+  insTfs
+}
+elseif( $insmode -eq 4 )
+{
+  insInit
+  insBuild
+}
+Else
+{
+    "Error Input"
+    Exit
+}
 #Install SQL
 #Write-Verbose "Starting SQLServer 2014 express installation..."
 #choco install sqlserver2014express  -y
@@ -133,6 +182,8 @@ Write-Verbose "VS Installation Completed"
 #Write-Verbose "Starting VS2013 ultimate express installation..."
 #choco install visualstudio2013ultimate -y
 
-Write-Verbose "Prerequisites script finished."
-Write-Host -NoNewLine 'Press any key to finish...';
-$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+#Write-Verbose "Prerequisites script finished."
+#Write-Host -NoNewLine 'Press any key to finish...';
+#$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+
+Write-Verbose "Prerequisites script finished. "
