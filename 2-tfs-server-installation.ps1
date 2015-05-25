@@ -10,10 +10,10 @@ Function insInit
 
   # Install NodeJS
   Write-Verbose "Starting NodeJS installation..."
-  cinst NodeJs -y
+  choco install NodeJs -y
   # Install Azure PowerShell
   Write-Verbose "Starting Azure Web Platform Installer..."
-  cinst webpicmd -y
+  choco install webpicmd -y
   webpicmd /Install /Products:"Microsoft Azure Powershell with Microsoft Azure Sdk" /AcceptEula
 
   # Install Microsoft Azure Cross Platform Command Line
@@ -22,7 +22,7 @@ Function insInit
   #$npmpath = npm config get prefix
   #setx PATH "$env:path;$npmpath" -m
   # Install WAWSDeploy
-  #cinst wawsdeploy -y
+  #choco install wawsdeploy -y
 
   # Install 7zip
   Write-Verbose "Starting 7zip installation..."
@@ -121,20 +121,31 @@ $VerbosePreference = "Continue"
 $ErrorActionPreference = "Stop"
 
 # Grant administrative privileges
-If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-  Write-Verbose "Script is not run with administrative user"
+#If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+#  Write-Verbose "Script is not run with administrative user"
+#
+#  If ((Get-WmiObject Win32_OperatingSystem | select BuildNumber).BuildNumber -ge 6000) {
+#    $CommandLine = $MyInvocation.Line.Replace($MyInvocation.InvocationName, $MyInvocation.MyCommand.Definition)
+#    Write-Verbose "  $CommandLine"
+# 
+#    Start-Process -FilePath PowerShell.exe -Verb Runas -ArgumentList "$CommandLine"
+#
+#  } else {
+#    Write-Verbose "System does not support UAC"
+#    Write-Warning "This script requires administrative privileges. Please re-run with administrative account."
+#  }
+#  Break
+#}
 
-  If ((Get-WmiObject Win32_OperatingSystem | select BuildNumber).BuildNumber -ge 6000) {
-    $CommandLine = $MyInvocation.Line.Replace($MyInvocation.InvocationName, $MyInvocation.MyCommand.Definition)
-    Write-Verbose "  $CommandLine"
- 
-    Start-Process -FilePath PowerShell.exe -Verb Runas -ArgumentList "$CommandLine"
+#Get Admin rights
+If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
+{   
+#No Administrative rights, it will display a popup window asking user for Admin rights
 
-  } else {
-    Write-Verbose "System does not support UAC"
-    Write-Warning "This script requires administrative privileges. Please re-run with administrative account."
-  }
-  Break
+$arguments = "& '" + $myinvocation.mycommand.definition + "'"
+Start-Process "$psHome\powershell.exe" -Verb runAs -ArgumentList $arguments
+
+break
 }
 
 Set-ExecutionPolicy -Scope Process Undefined -Force
@@ -187,3 +198,4 @@ Else
 #$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
 
 Write-Verbose "Prerequisites script finished. "
+Read-Host

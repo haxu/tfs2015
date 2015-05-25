@@ -1,9 +1,12 @@
-$tfsvm="tfs2015preivew"
-$tfsstorage='tfs2015preview'
-$tfsservice='tfs2015preview'
+$timestamp=get-date -UFormat %y%m%d%H%M
+$tfsvm="tfs" + $timestamp
+$tfsstorage='tfs' + $timestamp
+$tfsservice='tfs' + $timestamp
 $tfslocation='East Asia'
 $tfsadmin='tfsadmin'
 $tfsadminpwd='P2ssw0rd'
+$imgnm='fb83b3509582419d99629ce476bcb5c8__SQL-Server-2014-RTM-12.0.2048.0-Std-ENU-Win2012R2-cy15su04'
+$tfsrdp='C:\'+ $tfsvm + ".rdp"
 
 # The script has been tested on Powershell 3.0
 Set-StrictMode -Version 3
@@ -12,21 +15,25 @@ Set-StrictMode -Version 3
 $VerbosePreference = "Continue"
 $ErrorActionPreference = "Stop"
 
-# Grant administrative privileges
-If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-  Write-Verbose "Script is not run with administrative user"
+#Get Admin rights
+If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
+{   
+#No Administrative rights, it will display a popup window asking user for Admin rights
 
-  If ((Get-WmiObject Win32_OperatingSystem | select BuildNumber).BuildNumber -ge 6000) {
-    $CommandLine = $MyInvocation.Line.Replace($MyInvocation.InvocationName, $MyInvocation.MyCommand.Definition)
-    Write-Verbose "  $CommandLine"
- 
-    Start-Process -FilePath PowerShell.exe -Verb Runas -ArgumentList "$CommandLine"
+$arguments = "& '" + $myinvocation.mycommand.definition + "'"
+Start-Process "$psHome\powershell.exe" -Verb runAs -ArgumentList $arguments
 
-  } else {
-    Write-Verbose "System does not support UAC"
-    Write-Warning "This script requires administrative privileges. Please re-run with administrative account."
-  }
-  Break
+break
+}
+
+if (([System.Environment]::OSVersion.Version.Major) -eq 6)
+{
+  $AdminKey = 'HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}'
+  $UserKey = 'HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}'
+  Set-ItemProperty -Path $AdminKey -Name 'IsInstalled' -Value 0
+  Set-ItemProperty -Path $UserKey -Name 'IsInstalled' -Value 0
+  #Stop-Process -Name Explorer
+  Write-Host 'IE Enhanced Security Configuration (ESC) has been disabled.' -ForegroundColor Green
 }
 
 Set-ExecutionPolicy -Scope Process Undefined -Force
@@ -41,8 +48,15 @@ iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.p
 
 # Install Azure PowerShell
 Write-Verbose "Starting Azure Web Platform Installer..."
-cinst webpicmd -y
-webpicmd /Install /Products:"Microsoft Azure Powershell with Microsoft Azure Sdk" /AcceptEula
+choco install webpicmd -y
+webpicmd /Install /Products:"Microsoft Azure Powershell" /AcceptEula
+
+write-host "Systeam already init, reboot for proceed in 5 sec"
+Start-stop -s 5
+Restart-Computer -Wait
+
+write-host "***** Please input your Subscriber ID in another window !!! *****"
+write-host "!!!!! IF Error Occur, Please Reboot and Run This Script Again !!!!!" -BackgroundColor Red
 
 #login to azure
 add-azureaccount
@@ -66,9 +80,12 @@ Write-Verbose "Creating VM..."
 #$imgs = Get-AzureVMImage
 #$imgs | where {$_.Label -like 'sql server*'} | select Label, RecommendedVMSize, PublishedDate | Format-Table -AutoSize
 #get image name
-$imgnm = Get-AzureVMImage | where {$_.Label -eq 'SQL Server 2014 RTM Standard on Windows Server 2012 R2' -and $_.PublishedDate -eq '2015/4/15 15:00:00'} | select ImageName
-New-AzureVMConfig -Name $tfsvm -InstanceSize Basic_A2 -ImageName $imgnm.ImageName ` | Add-AzureProvisioningConfig -Windows -AdminUsername $tfsadmin -Password $tfsadminpwd ` | New-AzureVM -ServiceName $tfsservice -WaitForBoot
+#$imgnm = Get-AzureVMImage | where {$_.Label -eq 'SQL Server 2014 RTM Standard on Windows Server 2012 R2' -and $_.PublishedDate -eq '2015/4/15 15:00:00'} | select ImageName
+New-AzureVMConfig -Name $tfsvm -InstanceSize Basic_A2 -ImageName $imgnm ` | Add-AzureProvisioningConfig -Windows -AdminUsername $tfsadmin -Password $tfsadminpwd ` | New-AzureVM -ServiceName $tfsservice -WaitForBoot
 
+Get-AzureRemoteDesktopFile -ServiceName $tfsservice -Name $tfsvm -LocalPath $tfsrdp
 Write-Verbose 'Script Done£¡'
-Write-Verbose 'Please have your RDP in C:\TFS.RDP'
-Get-AzureRemoteDesktopFile -ServiceName $tfsservice -Name $tfsvm -LocalPath 'C:\TFS.RDP'
+Write-Verbose 'Please have your RDP in'
+Write-Host $tfsrdp
+Write-Verbose 'Please input any key to continue...'
+Read-Host
