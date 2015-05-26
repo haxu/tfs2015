@@ -1,3 +1,4 @@
+
 #Get Admin rights
 If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
 {   
@@ -8,6 +9,9 @@ Start-Process "$psHome\powershell.exe" -Verb runAs -ArgumentList $arguments
 
 break
 }
+
+set-executionpolicy Bypass
+
 # The script has been tested on Powershell 3.0
 Set-StrictMode -Version 3
 
@@ -15,7 +19,7 @@ Set-StrictMode -Version 3
 $VerbosePreference = "Continue"
 $ErrorActionPreference = "Stop"
 
-Set-ExecutionPolicy -Scope Process Undefined -Force
+#Set-ExecutionPolicy -Scope Process Undefined -Force
 
 if ($(Get-ExecutionPolicy) -eq "Restricted")
 {

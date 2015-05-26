@@ -109,7 +109,9 @@ Start-Process "$psHome\powershell.exe" -Verb runAs -ArgumentList $arguments
 break
 }
 
-Set-ExecutionPolicy -Scope Process Undefined -Force
+set-executionpolicy Bypass
+
+#Set-ExecutionPolicy -Scope Process Undefined -Force
 
 if ($(Get-ExecutionPolicy) -eq "Restricted")
 {
