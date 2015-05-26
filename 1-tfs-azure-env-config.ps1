@@ -1,16 +1,15 @@
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted -Force
 
 #Get Admin rights
 If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
 {   
 #No Administrative rights, it will display a popup window asking user for Admin rights
-
 $arguments = "& '" + $myinvocation.mycommand.definition + "'"
 Start-Process "$psHome\powershell.exe" -Verb runAs -ArgumentList $arguments
-
 break
 }
 
-set-executionpolicy Bypass
+#Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
 # The script has been tested on Powershell 3.0
 Set-StrictMode -Version 3
@@ -20,11 +19,10 @@ $VerbosePreference = "Continue"
 $ErrorActionPreference = "Stop"
 
 #Set-ExecutionPolicy -Scope Process Undefined -Force
-
-if ($(Get-ExecutionPolicy) -eq "Restricted")
-{
-    Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
-}
+#if ($(Get-ExecutionPolicy) -eq "Restricted")
+#{
+#    Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
+#}
 
 $timestamp=get-date -UFormat %y%m%d%H%M
 $tfsvm="tfs" + $timestamp
@@ -80,9 +78,10 @@ Write-Verbose "Creating VM..."
 #$imgs | where {$_.Label -like 'sql server*'} | select Label, RecommendedVMSize, PublishedDate | Format-Table -AutoSize
 #get image name
 #$imgnm = Get-AzureVMImage | where {$_.Label -eq 'SQL Server 2014 RTM Standard on Windows Server 2012 R2' -and $_.PublishedDate -eq '2015/4/15 15:00:00'} | select ImageName
-New-AzureVMConfig -Name $tfsvm -InstanceSize Basic_A2 -ImageName $imgnm ` | Add-AzureProvisioningConfig -Windows -AdminUsername $tfsadmin -Password $tfsadminpwd ` | New-AzureVM -ServiceName $tfsservice -WaitForBoot
+New-AzureVMConfig -Name $tfsvm -InstanceSize Basic_A2 -ImageName $imgnm ` | Add-AzureProvisioningConfig -Windows -AdminUsername $tfsadmin -Password $tfsadminpwd ` | Add-AzureEndpoint -Name "tfs" -Protocol "tcp" -PublicPort 8080 -LocalPort 8080 ` | New-AzureVM -ServiceName $tfsservice -WaitForBoot
 
 Get-AzureRemoteDesktopFile -ServiceName $tfsservice -Name $tfsvm -LocalPath $tfsrdp
+
 Write-Verbose 'Script Done£¡'
 Write-Verbose 'Please have your RDP in'
 Write-Host $tfsrdp
