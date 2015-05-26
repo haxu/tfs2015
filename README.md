@@ -1,28 +1,29 @@
-TFS2015RC Auto Installation Script.
+Team Foundation Server Installation Script.
 ===================================
 
-Help admin to deploy Microsoft Team Foundation Server 2015 RC and corss platform build environment quickly.
+1-tfs-azure-env-config.ps1 is for create Azure Basic A2 VM with SQL Server 2014 standard.
+2-tfs-server-installation.ps1 is for install and config TFS
+3-tfs-ubuntuagent-install.sh is for install build agent
 
-All the software installation depend on internet connection.
-
-The Scirpt has been tested on Azure Windows Server 2012 R2 VM and Azure Ubuntu 14.04 LTS VM.
+The Scirpt has been tested on Windows 10, Windows Server 2012 R2 VM and Azure Ubuntu 14.04 LTS VM.
 
 Usage:
 -------------------------------------------------------------------
-###tfs-server-install.ps1 is for windows server powershell
-	run it directly
-	.\tfs-server-install.ps1
+###right click and run with powershell
+	or run it directly in cmdlet
+	.\1-tfs-azure-env-config.ps1
+	.\2-tfs-server-installation.ps1
 
 ###tfs-linuxagent-install.sh is for linux bash
 	run this script with root
 	ubuntu e.g.
-	sudo .\tfs-linuxagent-install.sh
+	sudo .\3-tfs-ubuntuagent-install.sh
 
 
 
 Appendix
 -------------------------------------------------------------------
-###tfs-server-install.ps1 Installation List:
+###Windows Installation List:
 	Team Foundation Server 2015 RC EN
 	Visual Studio Community 2015 RC EN
 	Visual Studio Code
@@ -38,7 +39,7 @@ Appendix
 	Git
 	7zip
 
-###tfs-linuxagent-install.sh Installation List:
+###linux Installation List:
 	vsoagent
 	Node.js
 	GCC

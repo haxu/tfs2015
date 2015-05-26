@@ -1,20 +1,3 @@
-$timestamp=get-date -UFormat %y%m%d%H%M
-$tfsvm="tfs" + $timestamp
-$tfsstorage='tfs' + $timestamp
-$tfsservice='tfs' + $timestamp
-$tfslocation='East Asia'
-$tfsadmin='tfsadmin'
-$tfsadminpwd='P2ssw0rd'
-$imgnm='fb83b3509582419d99629ce476bcb5c8__SQL-Server-2014-RTM-12.0.2048.0-Std-ENU-Win2012R2-cy15su04'
-$tfsrdp='C:\'+ $tfsvm + ".rdp"
-
-# The script has been tested on Powershell 3.0
-Set-StrictMode -Version 3
-
-# Set the output level to verbose and make the script stop on error
-$VerbosePreference = "Continue"
-$ErrorActionPreference = "Stop"
-
 #Get Admin rights
 If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
 {   
@@ -25,6 +8,29 @@ Start-Process "$psHome\powershell.exe" -Verb runAs -ArgumentList $arguments
 
 break
 }
+# The script has been tested on Powershell 3.0
+Set-StrictMode -Version 3
+
+# Set the output level to verbose and make the script stop on error
+$VerbosePreference = "Continue"
+$ErrorActionPreference = "Stop"
+
+Set-ExecutionPolicy -Scope Process Undefined -Force
+
+if ($(Get-ExecutionPolicy) -eq "Restricted")
+{
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
+}
+
+$timestamp=get-date -UFormat %y%m%d%H%M
+$tfsvm="tfs" + $timestamp
+$tfsstorage='tfs' + $timestamp
+$tfsservice='tfs' + $timestamp
+$tfslocation='East Asia'
+$tfsadmin='tfsadmin'
+$tfsadminpwd='P2ssw0rd'
+$imgnm='fb83b3509582419d99629ce476bcb5c8__SQL-Server-2014-RTM-12.0.2048.0-Std-ENU-Win2012R2-cy15su04'
+$tfsrdp='C:\'+ $tfsvm + ".rdp"
 
 if (([System.Environment]::OSVersion.Version.Major) -eq 6)
 {
@@ -34,13 +40,6 @@ if (([System.Environment]::OSVersion.Version.Major) -eq 6)
   Set-ItemProperty -Path $UserKey -Name 'IsInstalled' -Value 0
   #Stop-Process -Name Explorer
   Write-Host 'IE Enhanced Security Configuration (ESC) has been disabled.' -ForegroundColor Green
-}
-
-Set-ExecutionPolicy -Scope Process Undefined -Force
-
-if ($(Get-ExecutionPolicy) -eq "Restricted")
-{
-    Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
 }
 
 Write-Verbose "Starting Chocolatey installation.."

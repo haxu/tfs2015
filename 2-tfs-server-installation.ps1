@@ -97,45 +97,6 @@ Function insVs
 }
 
 ###################################################################################################################
-Write-Host "---------------------------------------------------------------------------"
-Write-Host "|  Team Foundation Server 2015 RC Deployment Script v1.0                  |"
-Write-Host "|  Please Ensure You Have Internet Access                                 |"
-Write-Host "|  Installtation File around 5GB, time cost depends on the network speed  |"
-Write-Host "---------------------------------------------------------------------------"
-Write-Host ""
-Write-Host ""
-Write-Host "***************************************************************************"
-Write-Host "* Please choose your installation option:                                 *"
-Write-Host "*  Option[1]: TFS Full (TFS, Visual Studio and Build env)                 *" 
-Write-Host "*  Option[2]: TFS and Build without VS (TFS and Build env)                *"
-Write-Host "*  Option[3]: TFS only (Server only)                                      *"
-Write-Host "*  Option[4]: Build Env Only                                              *"
-Write-Host "***************************************************************************"
-$insmode = Read-Host
-
-# The script has been tested on Powershell 3.0
-Set-StrictMode -Version 3
-
-# Set the output level to verbose and make the script stop on error
-$VerbosePreference = "Continue"
-$ErrorActionPreference = "Stop"
-
-# Grant administrative privileges
-#If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-#  Write-Verbose "Script is not run with administrative user"
-#
-#  If ((Get-WmiObject Win32_OperatingSystem | select BuildNumber).BuildNumber -ge 6000) {
-#    $CommandLine = $MyInvocation.Line.Replace($MyInvocation.InvocationName, $MyInvocation.MyCommand.Definition)
-#    Write-Verbose "  $CommandLine"
-# 
-#    Start-Process -FilePath PowerShell.exe -Verb Runas -ArgumentList "$CommandLine"
-#
-#  } else {
-#    Write-Verbose "System does not support UAC"
-#    Write-Warning "This script requires administrative privileges. Please re-run with administrative account."
-#  }
-#  Break
-#}
 
 #Get Admin rights
 If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
@@ -154,6 +115,48 @@ if ($(Get-ExecutionPolicy) -eq "Restricted")
 {
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
 }
+
+# The script has been tested on Powershell 3.0
+Set-StrictMode -Version 3
+
+# Set the output level to verbose and make the script stop on error
+$VerbosePreference = "Continue"
+$ErrorActionPreference = "Stop"
+
+Write-Host "---------------------------------------------------------------------------"
+Write-Host "|  Team Foundation Server 2015 RC Deployment Script v1.0                  |"
+Write-Host "|  Please Ensure You Have Internet Access                                 |"
+Write-Host "|  Installtation File around 5GB, time cost depends on the network speed  |"
+Write-Host "---------------------------------------------------------------------------"
+Write-Host ""
+Write-Host ""
+Write-Host "***************************************************************************"
+Write-Host "* Please choose your installation option:                                 *"
+Write-Host "*  Option[1]: TFS Full (TFS, Visual Studio and Build env)                 *" 
+Write-Host "*  Option[2]: TFS and Build without VS (TFS and Build env)                *"
+Write-Host "*  Option[3]: TFS only (Server only)                                      *"
+Write-Host "*  Option[4]: Build Env Only                                              *"
+Write-Host "***************************************************************************"
+$insmode = Read-Host
+
+
+
+# Grant administrative privileges
+#If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+#  Write-Verbose "Script is not run with administrative user"
+#
+#  If ((Get-WmiObject Win32_OperatingSystem | select BuildNumber).BuildNumber -ge 6000) {
+#    $CommandLine = $MyInvocation.Line.Replace($MyInvocation.InvocationName, $MyInvocation.MyCommand.Definition)
+#    Write-Verbose "  $CommandLine"
+# 
+#    Start-Process -FilePath PowerShell.exe -Verb Runas -ArgumentList "$CommandLine"
+#
+#  } else {
+#    Write-Verbose "System does not support UAC"
+#    Write-Warning "This script requires administrative privileges. Please re-run with administrative account."
+#  }
+#  Break
+#}
 
 If( $insmode -eq 1 )
 {
