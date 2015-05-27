@@ -101,46 +101,26 @@ Function insVs
   Write-Verbose "VS Installation Completed"
 }
 
-###################################################################################################################
-
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted -Force
-
-#Get Admin rights
-If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
-{   
-#No Administrative rights, it will display a popup window asking user for Admin rights
-
-$arguments = "& '" + $myinvocation.mycommand.definition + "'"
-Start-Process "$psHome\powershell.exe" -Verb runAs -ArgumentList $arguments
-
-break
+Function insMenu($insmode)
+{
+    if([String]::IsNullOrEmpty($insmode))  
+    {
+        Write-Host "---------------------------------------------------------------------------"
+        Write-Host "|  Team Foundation Server 2015 RC Deploy Script v1.0                      |"
+        Write-Host "|  Please Ensure You Have Internet Access                                 |"
+        Write-Host "|  Installtation File around 5GB, time cost depends on the network speed  |"
+        Write-Host "---------------------------------------------------------------------------"
+        Write-Host ""
+        Write-Host ""
+        Write-Host "***************************************************************************"
+        Write-Host "* Please choose your deploy option:                                       *"
+        Write-Host "*  Option[1]: TFS Full (TFS, Visual Studio and Build env)                 *" 
+        Write-Host "*  Option[2]: TFS and Build env without VS (TFS and Build env)            *"
+        Write-Host "*  Option[3]: TFS only (Server only)                                      *"
+        Write-Host "*  Option[4]: Build Env Only                                              *"
+        Write-Host "***************************************************************************"
+        $insmode = Read-Host
 }
-
-#set-executionpolicy Bypass
-
-# The script has been tested on Powershell 3.0
-Set-StrictMode -Version 3
-
-# Set the output level to verbose and make the script stop on error
-$VerbosePreference = "Continue"
-$ErrorActionPreference = "Stop"
-
-Write-Host "---------------------------------------------------------------------------"
-Write-Host "|  Team Foundation Server 2015 RC Deploy Script v1.0                      |"
-Write-Host "|  Please Ensure You Have Internet Access                                 |"
-Write-Host "|  Installtation File around 5GB, time cost depends on the network speed  |"
-Write-Host "---------------------------------------------------------------------------"
-Write-Host ""
-Write-Host ""
-Write-Host "***************************************************************************"
-Write-Host "* Please choose your deploy option:                                       *"
-Write-Host "*  Option[1]: TFS Full (TFS, Visual Studio and Build env)                 *" 
-Write-Host "*  Option[2]: TFS and Build env without VS (TFS and Build env)            *"
-Write-Host "*  Option[3]: TFS only (Server only)                                      *"
-Write-Host "*  Option[4]: Build Env Only                                              *"
-Write-Host "***************************************************************************"
-$insmode = Read-Host
-
 # Grant administrative privileges
 #If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
 #  Write-Verbose "Script is not run with administrative user"
@@ -189,6 +169,33 @@ Else
     "Error Input"
     Exit
 }
+}
+###################################################################################################################
+
+#Get Admin rights
+If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
+{   
+#No Administrative rights, it will display a popup window asking user for Admin rights
+
+$arguments = "& '" + $myinvocation.mycommand.definition + "'"
+Start-Process "$psHome\powershell.exe" -Verb runAs -ArgumentList $arguments
+
+break
+}
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted -Force
+
+#set-executionpolicy Bypass
+
+# The script has been tested on Powershell 3.0
+Set-StrictMode -Version 3
+
+# Set the output level to verbose and make the script stop on error
+$VerbosePreference = "Continue"
+$ErrorActionPreference = "Stop"
+
+$option = $args
+
 #Install SQL
 #Write-Verbose "Starting SQLServer 2014 express installation..."
 #choco install sqlserver2014express  -y
@@ -202,6 +209,8 @@ Else
 #Write-Verbose "Prerequisites script finished."
 #Write-Host -NoNewLine 'Press any key to finish...';
 #$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+
+insMenu($option)
 
 Write-Verbose "Prerequisites script finished. Systeam will reboot "
 Read-Host
